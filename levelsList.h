@@ -19,11 +19,14 @@ typedef struct s_levels_list
 } t_levels_list;
 
 t_levels_cell* createCell(int value, int levels); // Maxime
+void freeCell(t_levels_cell* cell);
 t_levels_list* createEmptyList(int levels); // Dimitri
-void displayListLevel(int level, t_levels_list* list); // Maxime
+void freeList(t_levels_list* list);
+void displayListLevel(int level, t_levels_list list); // Maxime
+void displayPrettyListLevel(int level, t_levels_list list); // Dimitri
 void displayList(t_levels_list list); // Dimitri
 void displayPrettyList(t_levels_list list); // Dimitri
-void insertCellAtHead(t_levels_cell * cell,t_levels_list * list); // Maxime
-void insertCell(t_levels_cell * cell,t_levels_list * list); // Nous deux
+void insertCellAtHead(t_levels_cell *cell,t_levels_list * list); // Maxime
+void insertCell(t_levels_cell *cell,t_levels_list * list); // Nous deux
 
 #endif //DAYLIST_LEVELSLIST_H
