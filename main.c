@@ -6,7 +6,7 @@ int main() {
 
     t_levels_list * list = create2NLevelsSortedList(5);
 
-    t_levels_cell* celltest = createCell(32, 3);
+    t_levels_cell* celltest = createCell(1, 3);
     insertCell(celltest, list);
 
     displayPrettyList(*list);

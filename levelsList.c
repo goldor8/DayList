@@ -134,7 +134,7 @@ t_levels_list* create2NLevelsSortedList(int n) {
 
 int findListHeadLevelWithInferiorValue(int value, t_levels_list list){
     int searchingLevel = list.levels-1;
-    while (list.heads[searchingLevel] == NULL || list.heads[searchingLevel]->value > value){
+    while (list.heads[searchingLevel] == NULL || list.heads[searchingLevel]->value >= value){
         searchingLevel--;
         if(searchingLevel < 0){
             return -1;
@@ -177,10 +177,14 @@ void insertCell(t_levels_cell *cell, t_levels_list *list) {
         insertCellAtHead(cell, list);
         return;
     }
+    for (int i = searchingLevel + 1; i < cell->levels; ++i) {
+        cell->nexts[i] = list->heads[i];
+        list->heads[i] = cell;
+    }
     t_levels_cell* current = list->heads[searchingLevel];
     while (current != NULL && current->value != cell->value){
         t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
-        if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value <= cell->value) {
+        if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value < cell->value) {
             current = nextOnSearchingLevel;
         } else {
             if (searchingLevel < cell->levels) {
