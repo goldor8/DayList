@@ -63,7 +63,6 @@ void displayPrettyListLevel(int level, t_levels_list list){
         }
         lowPrevious = lowPrevious->nexts[0];
     }
-    printf("%2d", 18);
     printf("-->NULL\n");
 }
 
@@ -121,13 +120,11 @@ void insertCellAtHead(t_levels_cell * cell,t_levels_list * list){
 
 t_levels_list* create2NLevelsSortedList(int n) {
     t_levels_list* list = createEmptyList(n);
-    int size = pow(2, n);
-    for (int i = size-1; i > 0; i--) {
+    int size = pow(2, n) - 1;
+    for (int i = size; i > 0; i--) {
         int level = 1;
         for (int j = 1; j < n; ++j) {
-            if (i % (int) pow(2, j) == 0) {
-                level++;
-            }
+            if (i % (int) pow(2, j) == 0) level++;
         }
         t_levels_cell* cell = createCell(i, level);
         insertCellAtHead(cell, list);
@@ -135,27 +132,66 @@ t_levels_list* create2NLevelsSortedList(int n) {
     return list;
 }
 
-t_levels_cell *findCellInSortedList(int value, t_levels_list list) {
+int findListHeadLevelWithInferiorValue(int value, t_levels_list list){
     int searchingLevel = list.levels-1;
     while (list.heads[searchingLevel] == NULL || list.heads[searchingLevel]->value > value){
         searchingLevel--;
         if(searchingLevel < 0){
-            return NULL;
+            return -1;
         }
     }
+    return searchingLevel;
+}
+
+t_levels_cell *findCellInSortedList(int value, t_levels_list list) {
+    int searchingLevel = findListHeadLevelWithInferiorValue(value, list);
+    if(searchingLevel == -1) return NULL;
+
     t_levels_cell* current = list.heads[searchingLevel];
+
     while (current != NULL && current->value != value){
         t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
-        if(nextOnSearchingLevel == NULL || nextOnSearchingLevel->value > value){
+        if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value <= value) {
+            current = nextOnSearchingLevel;
+        } else {
             searchingLevel--;
-            if(searchingLevel < 0){
+            if (searchingLevel < 0) {
                 return NULL;
             }
         }
-        else{
-            current = nextOnSearchingLevel;
-        }
     }
     return current;
+}
+
+void insertCell(t_levels_cell *cell, t_levels_list *list) {
+    if(cell == NULL || list == NULL) {
+        printf("Error: cell or list is NULL\n");
+        return;
+    }
+    if (cell->levels > list->levels){
+        printf("Error: cell level is higher than list level\n");
+        return;
+    }
+    int searchingLevel = findListHeadLevelWithInferiorValue(cell->value, *list);
+    if(searchingLevel == -1){
+        insertCellAtHead(cell, list);
+        return;
+    }
+    t_levels_cell* current = list->heads[searchingLevel];
+    while (current != NULL && current->value != cell->value){
+        t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
+        if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value <= cell->value) {
+            current = nextOnSearchingLevel;
+        } else {
+            if (searchingLevel < cell->levels) {
+                cell->nexts[searchingLevel] = current->nexts[searchingLevel];
+                current->nexts[searchingLevel] = cell;
+            }
+            searchingLevel--;
+            if (searchingLevel < 0) {
+                return;
+            }
+        }
+    }
 }
 
