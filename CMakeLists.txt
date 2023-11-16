@@ -3,4 +3,4 @@ project(DayList C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(DayList main.c levelsList.c levelsList.h)
+add_executable(DayList main.c levelsList.c levelsList.h timer.c)

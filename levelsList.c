@@ -143,6 +143,26 @@ int findListHeadLevelWithInferiorValue(int value, t_levels_list list){
     return searchingLevel;
 }
 
+t_levels_cell* findCellInSortedListNotFast(int value, t_levels_list list){
+    int searchingLevel = 0;
+
+    t_levels_cell* current = list.heads[searchingLevel];
+
+    while (current != NULL && current->value != value){
+        t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
+        if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value <= value) {
+            current = nextOnSearchingLevel;
+        } else {
+            searchingLevel--;
+            if (searchingLevel < 0) {
+                return NULL;
+            }
+        }
+    }
+    return current;
+}
+
+
 t_levels_cell *findCellInSortedList(int value, t_levels_list list) {
     int searchingLevel = findListHeadLevelWithInferiorValue(value, list);
     if(searchingLevel == -1) return NULL;
