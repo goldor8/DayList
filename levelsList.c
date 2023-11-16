@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include "levelsList.h"
+#include <math.h>
 
 t_levels_list* createEmptyList(int levels){
     t_levels_list* list = (t_levels_list*) malloc(sizeof(t_levels_list));
@@ -62,6 +63,7 @@ void displayPrettyListLevel(int level, t_levels_list list){
         }
         lowPrevious = lowPrevious->nexts[0];
     }
+    printf("%2d", 18);
     printf("-->NULL\n");
 }
 
@@ -72,6 +74,10 @@ void displayPrettyList(t_levels_list list){
     }
 }
 t_levels_cell* createCell(int value, int levels){
+    if(levels < 1 ) {
+        printf("Error : trying to create cell with level < 1\n");
+        return NULL;
+    }
     t_levels_cell* cell = (t_levels_cell*) malloc(sizeof(t_levels_cell));
     cell->value = value;
     cell->levels = levels;
@@ -99,13 +105,57 @@ void displayListLevel(int level, t_levels_list list){
 }
 
 void insertCellAtHead(t_levels_cell * cell,t_levels_list * list){
+    if(cell == NULL || list == NULL) {
+        printf("Error: cell or list is NULL\n");
+        return;
+    }
     if (cell->levels > list->levels){
-        printf("cell level is higher than list level\n");
+        printf("Error: cell level is higher than list level\n");
         return;
     }
     for (int i = 0; i < cell->levels; i++){
         cell->nexts[i] = list->heads[i];
         list->heads[i] = cell;
     }
+}
+
+t_levels_list* create2NLevelsSortedList(int n) {
+    t_levels_list* list = createEmptyList(n);
+    int size = pow(2, n);
+    for (int i = size-1; i > 0; i--) {
+        int level = 1;
+        for (int j = 1; j < n; ++j) {
+            if (i % (int) pow(2, j) == 0) {
+                level++;
+            }
+        }
+        t_levels_cell* cell = createCell(i, level);
+        insertCellAtHead(cell, list);
+    }
+    return list;
+}
+
+t_levels_cell *findCellInSortedList(int value, t_levels_list list) {
+    int searchingLevel = list.levels-1;
+    while (list.heads[searchingLevel] == NULL || list.heads[searchingLevel]->value > value){
+        searchingLevel--;
+        if(searchingLevel < 0){
+            return NULL;
+        }
+    }
+    t_levels_cell* current = list.heads[searchingLevel];
+    while (current != NULL && current->value != value){
+        t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
+        if(nextOnSearchingLevel == NULL || nextOnSearchingLevel->value > value){
+            searchingLevel--;
+            if(searchingLevel < 0){
+                return NULL;
+            }
+        }
+        else{
+            current = nextOnSearchingLevel;
+        }
+    }
+    return current;
 }
 

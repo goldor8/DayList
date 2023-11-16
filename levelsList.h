@@ -28,5 +28,7 @@ void displayList(t_levels_list list); // Dimitri
 void displayPrettyList(t_levels_list list); // Dimitri
 void insertCellAtHead(t_levels_cell *cell,t_levels_list * list); // Maxime
 void insertCell(t_levels_cell *cell,t_levels_list * list); // Nous deux
+t_levels_list* create2NLevelsSortedList(int n);
+t_levels_cell* findCellInSortedList(int value, t_levels_list list);
 
 #endif //DAYLIST_LEVELSLIST_H

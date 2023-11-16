@@ -4,14 +4,17 @@
 int main() {
     printf("Hello, World!\n");
 
-    t_levels_list * list = createEmptyList(5);
-
-    for (int i = 0; i < 50; ++i) {
-        t_levels_cell* cellTemp = createCell(i, i%6);
-        insertCellAtHead(cellTemp, list);
-    }
+    t_levels_list * list = create2NLevelsSortedList(5);
 
     displayPrettyList(*list);
+
+    t_levels_cell* cell = findCellInSortedList(11, *list);
+    if(cell != NULL){
+        printf("Cell found: %d\n", cell->value);
+    }
+    else{
+        printf("Cell not found\n");
+    }
 
     freeList(list);
 
