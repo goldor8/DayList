@@ -6,15 +6,17 @@
 #include <string.h>
 #include "contact.h"
 
-void createContact(char *name, t_contact_list *list) {
+void createContact(char *firstname, char *lastname, t_contact_list *list) {
     t_contact_cell *cell = (t_contact_cell *) malloc(sizeof(t_contact_cell));
-    strcpy(cell->name, name);
+    strcpy(cell->firstname, firstname);
+    strcpy(cell->lastname, lastname);
     cell->next = list->head;
     list->head = cell;
 }
 
 void freeContactCell(t_contact_cell *cell) {
-    free(cell->name);
+    free(cell->firstname);
+    free(cell->lastname);
     free(cell);
 }
 
