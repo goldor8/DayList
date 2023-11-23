@@ -134,7 +134,7 @@ t_levels_list* create2NLevelsSortedList(int n) {
 
 int findListHeadLevelWithInferiorValue(int value, t_levels_list list){
     int searchingLevel = list.levels-1;
-    while (list.heads[searchingLevel] == NULL || list.heads[searchingLevel]->value >= value){
+    while (list.heads[searchingLevel] == NULL || list.heads[searchingLevel]->value > value){
         searchingLevel--;
         if(searchingLevel < 0){
             return -1;
@@ -144,22 +144,28 @@ int findListHeadLevelWithInferiorValue(int value, t_levels_list list){
 }
 
 t_levels_cell* findCellInSortedListNotFast(int value, t_levels_list list){
-    int searchingLevel = 0;
-
-    t_levels_cell* current = list.heads[searchingLevel];
-
-    while (current != NULL && current->value != value){
-        t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
-        if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value <= value) {
-            current = nextOnSearchingLevel;
-        } else {
-            searchingLevel--;
-            if (searchingLevel < 0) {
-                return NULL;
-            }
-        }
+//    int searchingLevel = 0;
+//
+//    t_levels_cell* current = list.heads[searchingLevel];
+//
+//    while (current != NULL && current->value != value){
+//        t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
+//        if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value <= value) {
+//            current = nextOnSearchingLevel;
+//        } else {
+//            searchingLevel--;
+//            if (searchingLevel < 0) {
+//                return NULL;
+//            }
+//        }
+//    }
+//    return current;
+    t_levels_cell* current = list.heads[0];
+    while (current->nexts[0] != NULL){
+        current = current->nexts[0];
+        if(current->value == value) return current;
     }
-    return current;
+    return NULL;
 }
 
 
@@ -217,5 +223,13 @@ void insertCell(t_levels_cell *cell, t_levels_list *list) {
             }
         }
     }
+}
+
+int findLastValue(t_levels_list list) {
+    t_levels_cell* current = list.heads[0];
+    while (current->nexts[0] != NULL){
+        current = current->nexts[0];
+    }
+    return current->value;
 }
 
