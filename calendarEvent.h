@@ -7,13 +7,11 @@
 
 #include "contact.h"
 #include "dateTime.h"
+#include "appointment.h"
 
 typedef struct s_calendar_event{
     t_contact_cell *contact;
-    char *description;
-    t_date *date;
-    t_time *startTime;
-    t_time *duration;
+    t_appointment_cell *appointment;
 } t_calendar_event;
 
 typedef struct s_calendar_event_cell
@@ -29,7 +27,7 @@ typedef struct s_calendar_event_list
 } t_calendar_event_list;
 
 
-t_calendar_event* createCalendarEvent(t_contact_cell *contact, char *description, t_date *date, t_time *startTime, t_time *duration);
+t_calendar_event* createCalendarEvent(t_contact_cell *contact, t_appointment_cell *appointment);
 void freeCalendarEvent(t_calendar_event *event);
 t_calendar_event_cell* createCalendarEventCell(t_calendar_event *event, int levels);
 void freeCalendarEventCell(t_calendar_event_cell* cell);
@@ -43,5 +41,6 @@ void insertCalendarEventCellAtHead(t_calendar_event_cell *cell, t_calendar_event
 void insertCalendarEventCell(t_calendar_event_cell *cell,t_calendar_event_list * list);
 t_calendar_event_cell* findCalendarEventInSortedListNotFast(int value, t_calendar_event_list list);
 t_calendar_event_cell* findCalenderEventInSortedList(int value, t_calendar_event_list list);
+
 
 #endif //DAYLIST_CALENDAREVENT_H

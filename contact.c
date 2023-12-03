@@ -1,7 +1,6 @@
 //
 // Created by Dimitri on 23/11/2023.
 //
-
 #include <stdlib.h>
 #include <string.h>
 #include "contact.h"
@@ -13,6 +12,29 @@ void createContact(char *firstname, char *lastname, t_contact_list *list) {
     cell->next = list->head;
     list->head = cell;
 }
+
+void addContact(t_contact_list *list, char *firstname, char *lastname) {
+    t_contact_cell *newContact = (t_contact_cell *)malloc(sizeof(t_contact_cell));
+    newContact->firstname = firstname;
+    newContact->lastname = lastname;
+    newContact->next = list->head;
+    list->head = newContact;
+}
+
+t_contact_cell *searchContact(char* partialName, t_contact_list *list) {
+    if (list == NULL || partialName == NULL || strlen(partialName) < 3 || list->head == NULL) {
+        return NULL;
+    }
+
+    for (t_contact_cell *currentContact = list->head; currentContact != NULL; currentContact = currentContact->next) {
+        if (strncasecmp(currentContact->firstname, partialName, strlen(partialName)) == 0) {
+            return currentContact;
+        }
+    }
+
+    return NULL;
+}
+
 
 void freeContactCell(t_contact_cell *cell) {
     free(cell->firstname);
@@ -36,3 +58,4 @@ void freeContactList(t_contact_list *list) {
     }
     free(list);
 }
+

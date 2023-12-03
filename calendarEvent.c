@@ -3,25 +3,33 @@
 //
 
 #include "calendarEvent.h"
+#include "contact.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-t_calendar_event* createCalendarEvent(t_contact_cell *contact, char *description, t_date *date, t_time *startTime, t_time *duration){
+t_calendar_event* createCalendarEvent(t_contact_cell *contact, t_appointment_cell *appointment) {
     t_calendar_event *event = (t_calendar_event *) malloc(sizeof(t_calendar_event));
-    event->contact = contact;
-    event->description = description;
-    event->date = date;
-    event->startTime = startTime;
-    event->duration = duration;
-    return event;
+
+    if (event != NULL) {
+        event->contact = contact;
+        event->appointment = appointment;
+        if (event->appointment != NULL) {
+            event->appointment->next = NULL;
+        }
+
+        return event;
+    } else {
+        return NULL;
+    }
 }
+
 
 void freeCalendarEvent(t_calendar_event *event){
     freeContactCell(event->contact);
-    free(event->description);
-    freeDate(event->date);
-    freeTime(event->startTime);
-    freeTime(event->duration);
+    free(event->appointment->description);
+    freeDate(event->appointment->date);
+    freeTime(event->appointment->startTime);
+    freeTime(event->appointment->duration);
     free(event);
 }
 
@@ -123,3 +131,4 @@ t_calendar_event_cell* findCalendarEventInSortedListNotFast(int value, t_calenda
 t_calendar_event_cell* findCalenderEventInSortedList(int value, t_calendar_event_list list){
     //todo: implement
 }
+
