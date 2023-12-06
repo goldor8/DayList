@@ -4,11 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "contact.h"
+#include "stringCopy.h"
 
 void createContact(char *firstname, char *lastname, t_contact_list *list) {
     t_contact_cell *cell = (t_contact_cell *) malloc(sizeof(t_contact_cell));
-    strcpy(cell->firstname, firstname);
-    strcpy(cell->lastname, lastname);
+    cell->firstname = stringcpy(firstname);
+    cell->lastname = stringcpy(lastname);
     cell->next = list->head;
     list->head = cell;
 }

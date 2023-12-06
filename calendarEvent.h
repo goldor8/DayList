@@ -24,6 +24,7 @@ typedef struct s_calendar_event_cell
 typedef struct s_calendar_event_list
 {
     t_calendar_event_cell **heads;
+    int levels;
 } t_calendar_event_list;
 
 
@@ -42,6 +43,5 @@ void insertCalendarEventCell(t_calendar_event_cell *cell,t_calendar_event_list *
 void removeAppointmentFromCalendarEvent(t_calendar_event_list *list, char *description);
 t_calendar_event_cell* findCalendarEventInSortedListNotFast(int value, t_calendar_event_list list);
 t_calendar_event_cell* findCalenderEventInSortedList(int value, t_calendar_event_list list);
-
 
 #endif //DAYLIST_CALENDAREVENT_H

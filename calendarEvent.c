@@ -24,7 +24,6 @@ t_calendar_event* createCalendarEvent(t_contact_cell *contact, t_appointment_cel
     }
 }
 
-
 void freeCalendarEvent(t_calendar_event *event){
     freeContactCell(event->contact);
     free(event->appointment->description);
@@ -49,6 +48,7 @@ void freeCalendarEventCell(t_calendar_event_cell* cell){
 
 t_calendar_event_list* createCalendarEventList(int levels){
     t_calendar_event_list *list = (t_calendar_event_list *) malloc(sizeof(t_calendar_event_list));
+    list->levels = levels;
     list->heads = (t_calendar_event_cell **) malloc(sizeof(t_calendar_event_cell *) * levels);
     for (int i = 0; i < levels; ++i) {
         list->heads[i] = NULL;
@@ -69,6 +69,10 @@ void freeCalendarEventList(t_calendar_event_list* list){
 }
 
 void displayCalendarEventListLevel(int level, t_calendar_event_list list){
+    if (level >= list.levels){
+        printf("cannot display level %d, max level is %d\n", level, list.levels - 1);
+        return;
+    }
     t_calendar_event_cell * current = list.heads[level];
     printf("Level %d : ", level);
     printf("HEAD->");
@@ -79,6 +83,10 @@ void displayCalendarEventListLevel(int level, t_calendar_event_list list){
     printf("NULL\n");
 }
 void displayPrettyCalendarEventListLevel(int level, t_calendar_event_list list){
+    if (level >= list.levels){
+        printf("cannot display level %d, max level is %d\n", level, list.levels - 1);
+        return;
+    }
     int maxCharactersCount = 4;
     char format[12]; // set it to "%" + maxCharactersCount + "d"
     sprintf(format, "[%%0.%ds | @]", maxCharactersCount);
@@ -174,4 +182,3 @@ t_calendar_event_cell* findCalendarEventInSortedListNotFast(int value, t_calenda
 t_calendar_event_cell* findCalenderEventInSortedList(int value, t_calendar_event_list list){
     //todo: implement
 }
-
