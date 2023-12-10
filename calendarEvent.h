@@ -35,10 +35,11 @@ t_calendar_event_list* createCalendarEventList(int levels);
 void freeCalendarEventList(t_calendar_event_list* list);
 void displayCalendarEventListLevel(int level, t_calendar_event_list list);
 void displayPrettyCalendarEventListLevel(int level, t_calendar_event_list list);
-void displayCalendarEventList(t_calendar_event_list list); // Dimitri
-void displayPrettyCalendarEventList(t_calendar_event_list list); // Dimitri
+void displayCalendarEventList(t_calendar_event_list list);
+void displayPrettyCalendarEventList(t_calendar_event_list list);
 void insertCalendarEventCellAtHead(t_calendar_event_cell *cell, t_calendar_event_list * list);
 void insertCalendarEventCell(t_calendar_event_cell *cell,t_calendar_event_list * list);
+void removeAppointmentFromCalendarEvent(t_calendar_event_list *list, char *description);
 t_calendar_event_cell* findCalendarEventInSortedListNotFast(int value, t_calendar_event_list list);
 t_calendar_event_cell* findCalenderEventInSortedList(int value, t_calendar_event_list list);
 

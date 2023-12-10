@@ -6,6 +6,7 @@
 #include "contact.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 t_calendar_event* createCalendarEvent(t_contact_cell *contact, t_appointment_cell *appointment) {
     t_calendar_event *event = (t_calendar_event *) malloc(sizeof(t_calendar_event));
@@ -123,6 +124,48 @@ void insertCalendarEventCellAtHead(t_calendar_event_cell *cell, t_calendar_event
 }
 void insertCalendarEventCell(t_calendar_event_cell *cell,t_calendar_event_list * list){
     //todo: implement
+}
+
+void removeAppointmentFromCalendarEvent(t_calendar_event_list *list, char *description)
+{
+    if (list == NULL || list->heads == NULL)
+    {
+        return;
+    }
+
+    int maxLevel = list->heads[0]->levels;
+
+    for (int level = maxLevel - 1; level >= 0; level--)
+    {
+        t_calendar_event_cell *current = list->heads[level];
+        t_calendar_event_cell *prev = NULL;
+
+        while (current != NULL)
+        {
+            if (strcmp(current->event->appointment->description, description) == 0)
+            {
+                if (prev == NULL)
+                {
+                    list->heads[level] = current->nexts[0];
+                }
+                else
+                {
+                    prev->nexts[level] = current->nexts[level];
+                }
+                free(current->event->appointment->description);
+                free(current->event->appointment->date);
+                free(current->event->appointment->startTime);
+                free(current->event->appointment->duration);
+                free(current->event->appointment);
+                free(current->event->contact);
+                free(current->event);
+                free(current);
+                break;
+            }
+            prev = current;
+            current = current->nexts[level];
+        }
+    }
 }
 
 t_calendar_event_cell* findCalendarEventInSortedListNotFast(int value, t_calendar_event_list list){
