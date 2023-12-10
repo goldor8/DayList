@@ -25,6 +25,18 @@ t_appointment_cell * createAppointment(char *description, t_date *date, t_time *
     return appointmentCell;
 }
 
+void insertAppointment(t_appointment_cell *appointment, t_appointment_list *list){
+    if(list->head == NULL){
+        list->head = appointment;
+        return;
+    }
+    t_appointment_cell *current = list->head;
+    while(current->next != NULL){
+        current = current->next;
+    }
+    current->next = appointment;
+}
+
 void freeAppointmentList(t_appointment_list *list) {
     t_appointment_cell *current = list->head;
     t_appointment_cell *next = NULL;

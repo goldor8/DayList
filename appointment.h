@@ -26,6 +26,7 @@ typedef struct s_appointment_list
 
 t_appointment_cell* createAppointment(char *description, t_date *date, t_time *startTime, t_time *duration);
 t_appointment_list* createAppointmentList();
+void insertAppointment(t_appointment_cell *appointment, t_appointment_list *list);
 void freeAppointmentList(t_appointment_list *list);
 
 #endif //DAYLIST_APPOINTMENT_H

@@ -39,13 +39,13 @@ void freeCalendarCalendarCell(t_contact_calendar_cell* cell);
 t_contact_calendar_list* createContactCalendarList(int levels);
 void freeContactCalendarList(t_contact_calendar_list* list);
 
-void displayAppointmentFromContactCalendar(t_contact_calendar_list *list);
+void displayAppointmentFromContactCalendar(t_contact_calendar_list *list, char *name);
 void displayContactCalendarListLevel(int level, t_contact_calendar_list list);
 void displayPrettyContactCalendarListLevel(int level, t_contact_calendar_list list);
 void displayContactCalendarList(t_contact_calendar_list list);
 void displayPrettyContactCalendarList(t_contact_calendar_list list);
 
-void saveAppointment(t_contact *contact,char *nameFile);
+void saveAppointment(t_contact_calendar_list *list);
 void loadAppointmentsFromFile(char *filename, t_appointment_list *appointmentList);
 
 void insertContactCalendar(t_contact_calendar *contactCalendar, t_contact_calendar_list * list);
@@ -53,4 +53,5 @@ void insertContactCalendar(t_contact_calendar *contactCalendar, t_contact_calend
 void removeAppointmentFromContactCalendar(t_contact_calendar_list *list, int id);
 
 t_contact_calendar_cell* searchContactCalendar(char *partialName, t_contact_calendar_list *list);
+
 #endif //DAYLIST_CONTACTCALENDAR_H

@@ -4,10 +4,10 @@
 
 #include "contactCalendar.h"
 #include "contact.h"
-#include "stringUtil.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "stringUtil.h"
 
 void createContactCalendar(t_contact *contact, t_contact_calendar_list *list){
     if (contact == NULL || list == NULL){
@@ -17,6 +17,30 @@ void createContactCalendar(t_contact *contact, t_contact_calendar_list *list){
     contactCalendar->contact = contact;
     contactCalendar->appointments = createAppointmentList();
     insertContactCalendar(contactCalendar, list);
+}
+
+void addAppointment(t_contact *contact, t_appointment_cell *appointment, t_contact_calendar_list *list){
+    if (contact == NULL || appointment == NULL || list == NULL){
+        return;
+    }
+    t_contact_calendar_cell *current = list->heads[0];
+    if (searchContactCalendar(contact->firstname, list) != NULL){
+        while (current != NULL){
+            if (strcmp(current->event->contact->firstname, contact->firstname) == 0){
+                t_appointment_cell *currentAppointment = current->event->appointments->head;
+                while (currentAppointment != NULL){
+                    if (currentAppointment->id == appointment->id){
+                        printf("Appointment with id %d already exists for %s %s\n", appointment->id, contact->firstname, contact->lastname);
+                        return;
+                    }
+                    currentAppointment = currentAppointment->next;
+                }
+                return;
+            }
+            current = current->nexts[0];
+        }
+    }
+    createContactCalendar(contact, list);
 }
 
 void freeContactCalendar(t_contact_calendar *event){
@@ -64,20 +88,25 @@ void freeContactCalendarList(t_contact_calendar_list* list){
     free(list);
 }
 
-void displayAppointmentFromContactCalendar(t_contact_calendar_list *list){
-    if (list == NULL || list->heads == NULL){
+void displayAppointmentFromContactCalendar(t_contact_calendar_list *list, char *name){
+    if (list == NULL || list->heads == NULL || name == NULL){
         return;
     }
-    t_contact_calendar_cell * current = list->heads[0];
+    t_contact_calendar_cell *current = list->heads[0];
+    //make the best display ever !
     while (current != NULL){
-        printf("Contact : %s %s\n", current->event->contact->firstname, current->event->contact->lastname);
-        t_appointment_cell * currentAppointment = current->event->appointments->head;
-        while (currentAppointment != NULL){
-            printf("Appointment : %s %s %s %s\n", currentAppointment->description, currentAppointment->date, currentAppointment->startTime, currentAppointment->duration);
-            currentAppointment = currentAppointment->next;
+        if (strcmp(current->event->contact->firstname, name) == 0){
+            printf("Appointments for %s %s :\n", current->event->contact->firstname, current->event->contact->lastname);
+            t_appointment_cell *currentAppointment = current->event->appointments->head;
+            while (currentAppointment != NULL){
+                printf("    Appointment %d : %s on %d/%d/%d at %d:%d for %d:%d\n", currentAppointment->id, currentAppointment->description, currentAppointment->date->day,currentAppointment->date->month,currentAppointment->date->year, currentAppointment->startTime->hour,currentAppointment->startTime->minute, currentAppointment->duration->hour, currentAppointment->duration->minute);
+                currentAppointment = currentAppointment->next;
+            }
+            return;
         }
         current = current->nexts[0];
     }
+    printf("No contact found with the name %s\n", name);
 }
 
 void displayContactCalendarListLevel(int level, t_contact_calendar_list list){
@@ -277,6 +306,13 @@ void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, int id)
     }
 }
 
+t_contact_calendar_cell* findCalendarEventInSortedListNotFast(int value, t_contact_calendar_list list){
+    //todo: implement
+}
+t_contact_calendar_cell* findCalenderEventInSortedList(int value, t_contact_calendar_list list){
+    //todo: implement
+}
+
 t_contact_calendar_cell* searchContactCalendar(char *partialName, t_contact_calendar_list *list){
     if (list == NULL || partialName == NULL || strlen(partialName) < 3) {
         return NULL;
@@ -291,46 +327,49 @@ t_contact_calendar_cell* searchContactCalendar(char *partialName, t_contact_cale
     return NULL;
 }
 
-//void saveAppointment(t_contact *contact, char *nameFile) {
-//    if (contact == NULL || ->head == NULL || nameFile == NULL) {
-//        return;
-//    }
-//
-//    FILE *fichier = fopen(nameFile, "w");
-//
-//    if (fichier == NULL) {
-//        perror("Erreur lors de l'ouverture du fichier");
-//        return;
-//    }
-//
-//    t_contact *currentContact = list->head;
-//
-//    while (currentContact != NULL) {
-//        fprintf(fichier, "%s %s\n", currentContact->firstname, currentContact->lastname);
-//        currentContact = currentContact->next;
-//    }
-//
-//    fclose(fichier);
-//}
-//
-//void loadAppointmentsFromFile(char *filename, t_appointment_list *appointmentList) {
-//    FILE *file = fopen(filename, "r");
-//    if (file == NULL) {
-//        perror("Erreur lors de l'ouverture du fichier");
-//        exit(EXIT_FAILURE);
-//    }
-//
-//    char description[100];  // Ajustez la taille selon vos besoins
-//    while (fgets(description, sizeof(description), file) != NULL) {
-//        strlen(description);
-//        if (strlen(description) > 0 && description[strlen(description) - 1] == '\n') {
-//            description[strlen(description) - 1] = '\0';
-//        }
-//        t_appointment_cell *appointmentCell = (t_appointment_cell *)malloc(sizeof(t_appointment_cell));
-//        appointmentCell->description = description;
-//        appointmentCell->next = appointmentList->head;
-//        appointmentList->head = appointmentCell;
-//    }
-//
-//    fclose(file);
-//}
+void saveAppointment(t_contact_calendar_list *list){
+    FILE *file = fopen("appointments.txt", "w");
+    if (file == NULL) {
+        perror("Erreur lors de l'ouverture du fichier");
+        exit(EXIT_FAILURE);
+    }
+
+    for (t_contact_calendar_cell *currentContact = list->heads[0]; currentContact != NULL; currentContact = currentContact->nexts[0]) {
+        for (t_appointment_cell *currentAppointment = currentContact->event->appointments->head; currentAppointment != NULL; currentAppointment = currentAppointment->next) {
+            fprintf(file, "%s %s %d %s %d %d %d %d %d\n", currentContact->event->contact->firstname, currentContact->event->contact->lastname, currentAppointment->id, currentAppointment->description, currentAppointment->date->day, currentAppointment->date->month, currentAppointment->date->year, currentAppointment->startTime->hour, currentAppointment->startTime->minute, currentAppointment->duration->hour, currentAppointment->duration->minute);
+        }
+        fprintf(file, "\n");
+    }
+    fclose(file);
+}
+
+void loadAppointment(char *filename,t_contact_calendar_list *list){
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        perror("Erreur lors de l'ouverture du fichier");
+        exit(EXIT_FAILURE);
+    }
+
+    char firstname[50];
+    char lastname[50];
+    int id;
+    char description[50];
+    int day;
+    int month;
+    int year;
+    int hour;
+    int minute;
+    int durationHour;
+    int durationMinute;
+
+    while (fscanf(file, "%s %s %d %s %d %d %d %d %d %d %d", firstname, lastname, &id, description, &day, &month, &year, &hour, &minute, &durationHour, &durationMinute) != EOF) {
+        t_contact *contact = createContact(firstname, lastname);
+        t_date *date = createDate(day, month, year);
+        t_time *startTime = createTime(hour, minute);
+        t_time *duration = createTime(durationHour, durationMinute);
+        t_appointment_cell *appointment = createAppointment(description, date, startTime, duration);
+        addAppointment(contact, appointment, list);
+    }
+
+    fclose(file);
+}
