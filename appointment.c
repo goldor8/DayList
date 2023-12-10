@@ -24,8 +24,8 @@ t_appointment_cell * createAppointment(char *description, t_date *date, t_time *
     return appointmentCell;
 }
 
-void saveAppointment(t_contact_list *list, char *nameFile) {
-    if (list == NULL || list->head == NULL || nameFile == NULL) {
+void saveAppointment(t_contact *contact, char *nameFile) {
+    if (contact == NULL || ->head == NULL || nameFile == NULL) {
         return;
     }
 
@@ -55,7 +55,6 @@ void loadAppointmentsFromFile(char *filename, t_appointment_list *appointmentLis
 
     char description[100];  // Ajustez la taille selon vos besoins
     while (fgets(description, sizeof(description), file) != NULL) {
-        // Supprimer le saut de ligne à la fin de la description
         strlen(description);
         if (strlen(description) > 0 && description[strlen(description) - 1] == '\n') {
             description[strlen(description) - 1] = '\0';
@@ -67,4 +66,15 @@ void loadAppointmentsFromFile(char *filename, t_appointment_list *appointmentLis
     }
 
     fclose(file);
+}
+
+void freeAppointmentList(t_appointment_list *list) {
+    t_appointment_cell *current = list->head;
+    t_appointment_cell *next = NULL;
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    free(list);
 }
