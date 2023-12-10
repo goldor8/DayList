@@ -3,46 +3,63 @@
 #include <stdlib.h>
 #include "levelsList.h"
 #include "timer.h"
+#include "math.h"
 #include "contact.h"
 #include "calendarEvent.h"
 #include "dateTime.h"
 #include "contact.h"
+#include "highRand.h"
 
+#define RESEARCH_VALUE 100
 
 int main() {
     printf("Hello, World!\n");
+    printf("Entrer le nombre de niveau de la liste\n");
+    int levels;
+    scanf("%d", &levels);
 
-    t_levels_list * list = create2NLevelsSortedList(16);
+    t_levels_list * list = create2NLevelsSortedList(levels);
 
-    t_levels_cell* celltest = createCell(1, 3);
-    insertCell(celltest, list);
+    //t_levels_cell* celltest = createCell(2, 2);
+    //insertCellWithRestrictedLevel(celltest, list, 1);
 
     printf("Last value: %d\n", findLastValue(*list));
+    //displayPrettyList(*list);
+
+    srand(time(NULL));
+    int maxResearchValue = (int) pow(2,levels) - 1;
 
     startTimer();
-    t_levels_cell* cell = findCellInSortedListNotFast(1000000000, *list);
+    for (int i = 0; i < RESEARCH_VALUE; ++i) {
+        int value = highRand() % maxResearchValue + 1;
+        t_levels_cell* cell = findCellInSortedListWithRestrictedLevel(value, *list, 1);
+        if(cell == NULL){
+            printf("Cell not found while searching : %d\n", value);
+        }
+    }
     stopTimer();
     displayTime();
-    if(cell != NULL){
-        printf("Cell found: %d\n", cell->value);
-    }
-    else{
-        printf("Cell not found\n");
-    }
+
 
     startTimer();
-    t_levels_cell* cell2 = findCellInSortedList(1000000000, *list);
+    for (int i = 0; i < RESEARCH_VALUE; ++i) {
+        int value = highRand() % maxResearchValue + 1;
+        t_levels_cell* cell = findCellInSortedList(value, *list);
+        if(cell == NULL){
+            printf("Cell not found while searching : %d\n", value);
+        }
+    }
     stopTimer();
-    displayTime();if(cell2 != NULL){
-        printf("Cell found: %d\n", cell2->value);
-    }
-    else{
-        printf("Cell not found\n");
-    }
+    displayTime();
 
     freeList(list);
 
 
+    scanf("%d");
+
+    for (int i = 0; i < 100; ++i) {
+        printf("%d\n", highRand() % 10);
+    }
 
 /*
     t_contact_list contactList;

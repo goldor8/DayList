@@ -144,22 +144,6 @@ int findListHeadLevelWithInferiorValue(int value, t_levels_list list){
 }
 
 t_levels_cell* findCellInSortedListNotFast(int value, t_levels_list list){
-//    int searchingLevel = 0;
-//
-//    t_levels_cell* current = list.heads[searchingLevel];
-//
-//    while (current != NULL && current->value != value){
-//        t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
-//        if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value <= value) {
-//            current = nextOnSearchingLevel;
-//        } else {
-//            searchingLevel--;
-//            if (searchingLevel < 0) {
-//                return NULL;
-//            }
-//        }
-//    }
-//    return current;
     t_levels_cell* current = list.heads[0];
     while (current->nexts[0] != NULL){
         current = current->nexts[0];
@@ -168,6 +152,15 @@ t_levels_cell* findCellInSortedListNotFast(int value, t_levels_list list){
     return NULL;
 }
 
+t_levels_cell* findCellInSortedListWithRestrictedLevel(int value, t_levels_list list, int restrictedLevel){
+    if(restrictedLevel < 0 || restrictedLevel >= list.levels) {
+        printf("Error: restricted level is not in list\n");
+        return NULL;
+    }
+    list.levels = restrictedLevel + 1;
+    t_levels_cell* cell = findCellInSortedList(value, list);
+    return cell;
+}
 
 t_levels_cell *findCellInSortedList(int value, t_levels_list list) {
     int searchingLevel = findListHeadLevelWithInferiorValue(value, list);
@@ -175,7 +168,7 @@ t_levels_cell *findCellInSortedList(int value, t_levels_list list) {
 
     t_levels_cell* current = list.heads[searchingLevel];
 
-    while (current != NULL && current->value != value){
+    while (current != NULL && current->value < value){
         t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
         if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value <= value) {
             current = nextOnSearchingLevel;
@@ -187,6 +180,33 @@ t_levels_cell *findCellInSortedList(int value, t_levels_list list) {
         }
     }
     return current;
+}
+
+void insertCellNotFast(t_levels_cell *cell, t_levels_list *list) {
+    if(cell == NULL || list == NULL) {
+        printf("Error: cell or list is NULL\n");
+        return;
+    }
+    if (cell->levels > list->levels){
+        printf("Error: cell level is higher than list level\n");
+        return;
+    }
+
+    for (int i = 0; i < cell->levels; ++i) {
+        t_levels_cell* current = list->heads[i];
+        if(current == NULL || cell->value < current->value){
+            cell->nexts[i] = list->heads[i];
+            list->heads[i] = cell;
+        } else {
+            while (current->nexts[i] != NULL && current->nexts[i]->value < cell->value){
+                current = current->nexts[i];
+            }
+            cell->nexts[i] = current->nexts[i];
+            current->nexts[i] = cell;
+        }
+    }
+
+
 }
 
 void insertCell(t_levels_cell *cell, t_levels_list *list) {
@@ -208,7 +228,7 @@ void insertCell(t_levels_cell *cell, t_levels_list *list) {
         list->heads[i] = cell;
     }
     t_levels_cell* current = list->heads[searchingLevel];
-    while (current != NULL && current->value != cell->value){
+    while (current != NULL && current->value < cell->value){
         t_levels_cell* nextOnSearchingLevel = current->nexts[searchingLevel];
         if (nextOnSearchingLevel != NULL && nextOnSearchingLevel->value < cell->value) {
             current = nextOnSearchingLevel;
@@ -231,5 +251,24 @@ int findLastValue(t_levels_list list) {
         current = current->nexts[0];
     }
     return current->value;
+}
+
+void insertCellWithRestrictedLevel(t_levels_cell *cell, t_levels_list *list, int restrictedLevel) {
+    if(cell == NULL || list == NULL) {
+        printf("Error: cell or list is NULL\n");
+        return;
+    }
+    if (cell->levels > restrictedLevel + 1){
+        printf("Error: cell level is higher than restricted level\n");
+        return;
+    }
+    if(restrictedLevel < 0 || restrictedLevel >= list->levels) {
+        printf("Error: restricted level is not in list\n");
+        return;
+    }
+    int normalListLevel = list->levels;
+    list->levels = restrictedLevel + 1;
+    insertCell(cell, list);
+    list->levels = normalListLevel;
 }
 
