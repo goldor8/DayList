@@ -39,6 +39,7 @@ void freeCalendarCalendarCell(t_contact_calendar_cell* cell);
 t_contact_calendar_list* createContactCalendarList(int levels);
 void freeContactCalendarList(t_contact_calendar_list* list);
 
+void displayAppointmentFromContactCalendar(t_contact_calendar_list *list);
 void displayContactCalendarListLevel(int level, t_contact_calendar_list list);
 void displayPrettyContactCalendarListLevel(int level, t_contact_calendar_list list);
 void displayContactCalendarList(t_contact_calendar_list list);

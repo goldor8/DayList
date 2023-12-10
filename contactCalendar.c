@@ -9,15 +9,14 @@
 #include <string.h>
 
 void createContactCalendar(t_contact *contact, t_contact_calendar_list *list){
-    t_contact_calendar *event = (t_contact_calendar *) malloc(sizeof(t_contact_calendar));
-
-    if (event != NULL) {
-        event->contact = contact;
-        event->appointments = (t_appointment_list *) malloc(sizeof(t_appointment_list));
-        return;
-    } else {
+    if (contact == NULL || list == NULL){
         return;
     }
+    t_contact_calendar *event = (t_contact_calendar *) malloc(sizeof(t_contact_calendar));
+    event->contact = contact;
+    event->appointments = (t_appointment_list *) malloc(sizeof(t_appointment_list));
+    t_contact_calendar_cell *cell = createContactCalendarCell(event, list->levels);
+    insertContactCalendarCell(cell, list);
 }
 
 void freeContactCalendar(t_contact_calendar *event){
@@ -59,6 +58,22 @@ void freeContactCalendarList(t_contact_calendar_list* list){
     }
     free(list->heads);
     free(list);
+}
+
+void displayAppointmentFromContactCalendar(t_contact_calendar_list *list){
+    if (list == NULL || list->heads == NULL){
+        return;
+    }
+    t_contact_calendar_cell * current = list->heads[0];
+    while (current != NULL){
+        printf("Contact : %s %s\n", current->event->contact->firstname, current->event->contact->lastname);
+        t_appointment_cell * currentAppointment = current->event->appointments->head;
+        while (currentAppointment != NULL){
+            printf("Appointment : %s %s %s %s\n", currentAppointment->description, currentAppointment->date, currentAppointment->startTime, currentAppointment->duration);
+            currentAppointment = currentAppointment->next;
+        }
+        current = current->nexts[0];
+    }
 }
 
 void displayContactCalendarListLevel(int level, t_contact_calendar_list list){
