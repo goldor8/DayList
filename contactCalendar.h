@@ -45,10 +45,10 @@ void displayPrettyContactCalendarListLevel(int level, t_contact_calendar_list li
 void displayContactCalendarList(t_contact_calendar_list list);
 void displayPrettyContactCalendarList(t_contact_calendar_list list);
 
+void saveAppointment(t_contact *contact,char *nameFile);
+void loadAppointmentsFromFile(char *filename, t_appointment_list *appointmentList);
 
-
-void insertContactCalendarCellAtHead(t_contact_calendar_cell *cell, t_contact_calendar_list * list);
-void insertContactCalendarCell(t_contact_calendar_cell *cell, t_contact_calendar_list * list);
+void insertContactCalendar(t_contact_calendar *contactCalendar, t_contact_calendar_list * list);
 
 void removeAppointmentFromContactCalendar(t_contact_calendar_list *list, int id);
 

@@ -21,51 +21,8 @@ t_appointment_cell * createAppointment(char *description, t_date *date, t_time *
     appointmentCell->date = date;
     appointmentCell->startTime = startTime;
     appointmentCell->duration = duration;
+    appointmentCell->next = NULL;
     return appointmentCell;
-}
-
-void saveAppointment(t_contact *contact, char *nameFile) {
-    if (contact == NULL || ->head == NULL || nameFile == NULL) {
-        return;
-    }
-
-    FILE *fichier = fopen(nameFile, "w");
-
-    if (fichier == NULL) {
-        perror("Erreur lors de l'ouverture du fichier");
-        return;
-    }
-
-    t_contact *currentContact = list->head;
-
-    while (currentContact != NULL) {
-        fprintf(fichier, "%s %s\n", currentContact->firstname, currentContact->lastname);
-        currentContact = currentContact->next;
-    }
-
-    fclose(fichier);
-}
-
-void loadAppointmentsFromFile(char *filename, t_appointment_list *appointmentList) {
-    FILE *file = fopen(filename, "r");
-    if (file == NULL) {
-        perror("Erreur lors de l'ouverture du fichier");
-        exit(EXIT_FAILURE);
-    }
-
-    char description[100];  // Ajustez la taille selon vos besoins
-    while (fgets(description, sizeof(description), file) != NULL) {
-        strlen(description);
-        if (strlen(description) > 0 && description[strlen(description) - 1] == '\n') {
-            description[strlen(description) - 1] = '\0';
-        }
-        t_appointment_cell *appointmentCell = (t_appointment_cell *)malloc(sizeof(t_appointment_cell));
-        appointmentCell->description = description;
-        appointmentCell->next = appointmentList->head;
-        appointmentList->head = appointmentCell;
-    }
-
-    fclose(file);
 }
 
 void freeAppointmentList(t_appointment_list *list) {
@@ -77,4 +34,10 @@ void freeAppointmentList(t_appointment_list *list) {
         current = next;
     }
     free(list);
+}
+
+t_appointment_list *createAppointmentList() {
+    t_appointment_list* list = (t_appointment_list *) malloc(sizeof(t_appointment_list));
+    list->head = NULL;
+    return list;
 }
