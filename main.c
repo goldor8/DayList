@@ -11,7 +11,7 @@
 #define RESEARCH_VALUE 100
 
 int main() {
-    t_contact_list contactList;
+    t_contact contactList;
 
     addContact(&contactList, "John", "Doe");
     addContact(&contactList, "Jane", "Smith");

@@ -44,6 +44,8 @@ void displayPrettyContactCalendarListLevel(int level, t_contact_calendar_list li
 void displayContactCalendarList(t_contact_calendar_list list);
 void displayPrettyContactCalendarList(t_contact_calendar_list list);
 
+
+
 void insertContactCalendarCellAtHead(t_contact_calendar_cell *cell, t_contact_calendar_list * list);
 void insertContactCalendarCell(t_contact_calendar_cell *cell, t_contact_calendar_list * list);
 

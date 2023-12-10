@@ -25,7 +25,8 @@ typedef struct s_appointment_list
 } t_appointment_list;
 
 t_appointment_cell * createAppointment(char *description, t_date *date, t_time *startTime, t_time *duration);
-void saveAppointment(t_contact_list *list,char *nameFile);
+void saveAppointment(t_contact *contact,char *nameFile);
 void loadAppointmentsFromFile(char *filename, t_appointment_list *appointmentList);
+void freeAppointmentList(t_appointment_list *list);
 
 #endif //DAYLIST_APPOINTMENT_H

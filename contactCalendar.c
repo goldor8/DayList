@@ -8,28 +8,21 @@
 #include <stdio.h>
 #include <string.h>
 
-t_contact_calendar* createContactCalendar(t_contact *contact, t_appointment_cell *appointment) {
+void createContactCalendar(t_contact *contact, t_contact_calendar_list *list){
     t_contact_calendar *event = (t_contact_calendar *) malloc(sizeof(t_contact_calendar));
 
     if (event != NULL) {
         event->contact = contact;
-        event->appointments = appointment;
-        if (event->appointments != NULL) {
-            event->appointments->next = NULL;
-        }
-
-        return event;
+        event->appointments = (t_appointment_list *) malloc(sizeof(t_appointment_list));
+        return;
     } else {
-        return NULL;
+        return;
     }
 }
 
 void freeContactCalendar(t_contact_calendar *event){
     freeContact(event->contact);
-    free(event->appointments->description);
-    freeDate(event->appointments->date);
-    freeTime(event->appointments->startTime);
-    freeTime(event->appointments->duration);
+    freeAppointmentList(event->appointments);
     free(event);
 }
 
@@ -124,17 +117,12 @@ void displayPrettyCalendarEventList(t_contact_calendar_list list){
         displayPrettyContactCalendarListLevel(i, list);
     }
 }
-void insertContactCalendarCellAtHead(t_contact_calendar_cell *cell, t_contact_calendar_list * list){
-    for (int i = 0; i < cell->levels; ++i) {
-        cell->nexts[i] = list->heads[i];
-        list->heads[i] = cell;
-    }
-}
+
 void insertContactCalendarCell(t_contact_calendar_cell *cell, t_contact_calendar_list * list){
     //todo: implement
 }
 
-void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, char *description)
+void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, int id)
 {
     if (list == NULL || list->heads == NULL)
     {
@@ -150,7 +138,7 @@ void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, char *des
 
         while (current != NULL)
         {
-            if (strcmp(current->event->appointments->description, description) == 0)
+            if (current->event->appointments->head->id == id)
             {
                 if (prev == NULL)
                 {
@@ -160,11 +148,14 @@ void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, char *des
                 {
                     prev->nexts[level] = current->nexts[level];
                 }
-                free(current->event->appointments->description);
-                free(current->event->appointments->date);
-                free(current->event->appointments->startTime);
-                free(current->event->appointments->duration);
+                free(current->event->appointments->head->description);
+                free(current->event->appointments->head->date);
+                free(current->event->appointments->head->startTime);
+                free(current->event->appointments->head->duration);
+                free(current->event->appointments->head);
                 free(current->event->appointments);
+                free(current->event->contact->firstname);
+                free(current->event->contact->lastname);
                 free(current->event->contact);
                 free(current->event);
                 free(current);
@@ -181,4 +172,18 @@ t_contact_calendar_cell* findCalendarEventInSortedListNotFast(int value, t_conta
 }
 t_contact_calendar_cell* findCalenderEventInSortedList(int value, t_contact_calendar_list list){
     //todo: implement
+}
+
+t_contact_calendar_cell* searchContactCalendar(char *partialName, t_contact_calendar_list *list){
+    if (list == NULL || partialName == NULL || strlen(partialName) < 3) {
+        return NULL;
+    }
+
+    for (t_contact_calendar_cell *currentContact = list->heads[0]; currentContact != NULL; currentContact = currentContact->nexts[0]) {
+        if (strncasecmp(currentContact->event->contact->lastname, partialName, strlen(partialName)) == 0) {
+            return currentContact;
+        }
+    }
+
+    return NULL;
 }

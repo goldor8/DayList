@@ -13,7 +13,6 @@ typedef struct s_contact
     char *lastname;
 } t_contact;
 
-t_contact* searchContact(char *partialName, t_contact_list *list);
 t_contact* createContact(char *firstname, char *lastname);
 void freeContact(t_contact *cell);
 
