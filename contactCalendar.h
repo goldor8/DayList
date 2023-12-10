@@ -46,11 +46,11 @@ void displayContactCalendarList(t_contact_calendar_list list);
 void displayPrettyContactCalendarList(t_contact_calendar_list list);
 
 void saveAppointment(t_contact_calendar_list *list);
-void loadAppointmentsFromFile(char *filename, t_appointment_list *appointmentList);
+void loadAppointment(t_contact_calendar_list *appointmentList);
 
 void insertContactCalendar(t_contact_calendar *contactCalendar, t_contact_calendar_list * list);
 
-void removeAppointmentFromContactCalendar(t_contact_calendar_list *list, int id);
+void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, int id);
 
 t_contact_calendar_cell* searchContactCalendar(char *partialName, t_contact_calendar_list *list);
 

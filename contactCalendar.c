@@ -95,7 +95,7 @@ void displayAppointmentFromContactCalendar(t_contact_calendar_list *list, char *
     t_contact_calendar_cell *current = list->heads[0];
     //make the best display ever !
     while (current != NULL){
-        if (strcmp(current->event->contact->firstname, name) == 0){
+        if (strcmp(current->event->contact->lastname, name) == 0){
             printf("Appointments for %s %s :\n", current->event->contact->firstname, current->event->contact->lastname);
             t_appointment_cell *currentAppointment = current->event->appointments->head;
             while (currentAppointment != NULL){
@@ -306,13 +306,6 @@ void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, int id)
     }
 }
 
-t_contact_calendar_cell* findCalendarEventInSortedListNotFast(int value, t_contact_calendar_list list){
-    //todo: implement
-}
-t_contact_calendar_cell* findCalenderEventInSortedList(int value, t_contact_calendar_list list){
-    //todo: implement
-}
-
 t_contact_calendar_cell* searchContactCalendar(char *partialName, t_contact_calendar_list *list){
     if (list == NULL || partialName == NULL || strlen(partialName) < 3) {
         return NULL;
@@ -343,8 +336,8 @@ void saveAppointment(t_contact_calendar_list *list){
     fclose(file);
 }
 
-void loadAppointment(char *filename,t_contact_calendar_list *list){
-    FILE *file = fopen(filename, "r");
+void loadAppointment(t_contact_calendar_list *list){
+    FILE *file = fopen("appointments.txt", "r");
     if (file == NULL) {
         perror("Erreur lors de l'ouverture du fichier");
         exit(EXIT_FAILURE);

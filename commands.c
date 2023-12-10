@@ -7,6 +7,8 @@
 #include <string.h>
 #include <ctype.h>
 #include "commands.h"
+#include "dateTime.h"
+#include "App.h"
 
 Command** CommandList = NULL;
 int CommandCount;
@@ -213,10 +215,191 @@ int isNumber(char number[])
     return 1;
 }
 
+t_date* getDate(char* date){
+    if(strlen(date) != 10){
+        printf("Invalid date format\n");
+        return NULL;
+    }
+    if(date[2] != '/' || date[5] != '/'){
+        printf("Invalid date format\n");
+        return NULL;
+    }
+
+    char day[] = {date[0], date[1], '\0'};
+    char month[] = {date[3], date[4], '\0'};
+    char year[] = {date[6], date[7], date[8], date[9], '\0'};
+
+    if(!isNumber(day) || !isNumber(month) || !isNumber(year)){
+        printf("Invalid date format\n");
+        return NULL;
+    }
+
+    int dayInt = strtof(day, NULL);
+    int monthInt = strtof(month, NULL);
+    int yearInt = strtof(year, NULL);
+
+    if(dayInt < 1 || dayInt > 31){
+        printf("Invalid day\n");
+        return NULL;
+    }
+
+    if(monthInt < 1 || monthInt > 12){
+        printf("Invalid month\n");
+        return NULL;
+    }
+
+    if(yearInt < 0){
+        printf("Invalid year\n");
+        return NULL;
+    }
+
+    t_date* parsedDate = malloc(sizeof(t_date));
+    parsedDate->day = dayInt;
+    parsedDate->month = monthInt;
+    parsedDate->year = yearInt;
+    return parsedDate;
+}
+
+t_time* getTime(char* time){
+    if(strlen(time) != 5){
+        printf("Invalid time format\n");
+        return NULL;
+    }
+    if(time[2] != ':'){
+        printf("Invalid time format\n");
+        return NULL;
+    }
+
+    char hour[] = {time[0], time[1], '\0'};
+    char minute[] = {time[3], time[4], '\0'};
+
+    if(!isNumber(hour) || !isNumber(minute)){
+        printf("Invalid time format\n");
+        return NULL;
+    }
+
+    int hourInt = strtof(hour, NULL);
+    int minuteInt = strtof(minute, NULL);
+
+    if(hourInt < 0 || hourInt > 23){
+        printf("Invalid hour\n");
+        return NULL;
+    }
+
+    if(minuteInt < 0 || minuteInt > 59){
+        printf("Invalid minute\n");
+        return NULL;
+    }
+
+    t_time* parsedTime = malloc(sizeof(t_time));
+    parsedTime->hour = hourInt;
+    parsedTime->minute = minuteInt;
+    return parsedTime;
+}
+
 void HelpCommand(char** args, int argCount){
     PrintCommands();
+    printf("Note: valid date format is dd/mm/yyyy and valid time format is hh:mm\n");
+}
+
+void ExitCommand(char** args, int argCount){
+    stopApp();
+}
+
+void SaveCommand(char** args, int argCount){
+    if(argCount < 1){
+        printf("Not enough arguments\n");
+        return;
+    }
+
+    appSaveCalendar();
+}
+
+void LoadCommand(char** args, int argCount){
+    if(argCount < 1){
+        printf("Not enough arguments\n");
+        return;
+    }
+    appLoadCalendar();
+}
+
+void AddContactCommand(char** args, int argCount){
+    if(argCount < 2){
+        printf("Not enough arguments\n");
+        return;
+    }
+    appAddContact(args[0], args[1]);
+}
+
+void SearchContactCommand(char** args, int argCount){
+    if(argCount < 1){
+        printf("Not enough arguments\n");
+        return;
+    }
+
+    appSearchContact(args[0]);
+}
+
+void ShowContactCommand(char** args, int argCount){
+    appShowContacts();
+}
+
+void AddAppointmentCommand(char** args, int argCount){
+    if(argCount < 4){
+        printf("Not enough arguments\n");
+        return;
+    }
+
+    t_date* date = getDate(args[2]);
+    if(date == NULL)
+        return;
+    t_time *time = getTime(args[3]);
+    if(time == NULL)
+        return;
+    t_time *duration = getTime(args[4]);
+    if(duration == NULL)
+        return;
+    appAddAppointment(args[5], date, time, duration, args[0], args[1]);
+}
+
+void RemoveAppointmentCommand(char** args, int argCount){
+    if(argCount < 1){
+        printf("Not enough arguments\n");
+        return;
+    }
+
+    if(!isNumber(args[1])){
+        printf("Id must be a number\n");
+        return;
+    }
+
+    int id = strtof(args[1], NULL);
+    appRemoveAppointment(id);
+}
+
+void ShowAppointmentCommand(char** args, int argCount){
+    if(argCount < 1){
+        printf("Not enough arguments\n");
+        return;
+    }
+
+    appShowAppointments(args[0]);
 }
 
 void InitCommands(){
     AddCommand("help", "Prints all commands", HelpCommand, NULL);
+    AddCommand("exit", "Exits the program", ExitCommand, NULL);
+
+    AddCommand("save", "Saves the current calendar", SaveCommand, "<filename>");
+    AddCommand("load", "Loads a calendar", LoadCommand, "<filename>");
+
+    AddCommand("contact", "Contact management", NULL, NULL);
+    AddSubCommand((char*[]){"contact"}, 1, "add", "Adds a contact", AddContactCommand, "<firstname> <lastname>");
+    AddSubCommand((char*[]){"contact"}, 1, "search", "Search a contact", SearchContactCommand, "<partial_lastname>");
+    AddSubCommand((char*[]){"contact"}, 1, "show", "Shows all contacts", ShowContactCommand, NULL);
+
+    AddCommand("appointment", "Appointment management", NULL, NULL);
+    AddSubCommand((char*[]){"appointment"}, 1, "add", "Adds an appointment", AddAppointmentCommand, "<contact_firstname> <contact_lastname> <date> <startTime> <duration> <description>");
+    AddSubCommand((char*[]){"appointment"}, 1, "remove", "Removes an appointment", RemoveAppointmentCommand, "<contact_lastname> <id>");
+    AddSubCommand((char*[]){"appointment"}, 1, "show", "Shows all appointments for a contact", ShowAppointmentCommand, "<contact_lastname>");
 }
