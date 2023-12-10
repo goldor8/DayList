@@ -7,9 +7,16 @@
 #include <stdio.h>
 #include <string.h>
 
+unsigned int currentId = 0;
+
+int GetNextId() {
+    return currentId++;
+}
+
 
 t_appointment_cell * createAppointment(char *description, t_date *date, t_time *startTime, t_time *duration){
     t_appointment_cell *appointmentCell = (t_appointment_cell *) malloc(sizeof(t_appointment_cell));
+    appointmentCell->id = GetNextId();
     appointmentCell->description = description;
     appointmentCell->date = date;
     appointmentCell->startTime = startTime;
@@ -29,7 +36,7 @@ void saveAppointment(t_contact_list *list, char *nameFile) {
         return;
     }
 
-    t_contact_cell *currentContact = list->head;
+    t_contact *currentContact = list->head;
 
     while (currentContact != NULL) {
         fprintf(fichier, "%s %s\n", currentContact->firstname, currentContact->lastname);

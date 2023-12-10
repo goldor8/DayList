@@ -5,24 +5,17 @@
 #ifndef DAYLIST_CONTACT_H
 #define DAYLIST_CONTACT_H
 
-typedef struct s_contact_cell
+#include "appointment.h"
+
+typedef struct s_contact
 {
     char *firstname;
     char *lastname;
-    struct s_contact_cell *next;
-} t_contact_cell;
+} t_contact;
 
-typedef struct s_contact_list
-{
-    t_contact_cell *head;
-} t_contact_list;
-
-void createContact(char *firstname, char *lastname, t_contact_list *list);
-void addContact(t_contact_list *list, char *firstname, char *lastname);
-t_contact_cell* searchContact(char *partialName, t_contact_list *list);
-void freeContactCell(t_contact_cell *cell);
-t_contact_list* createContactList();
-void freeContactList(t_contact_list *list);
+t_contact* searchContact(char *partialName, t_contact_list *list);
+t_contact* createContact(char *firstname, char *lastname);
+void freeContact(t_contact *cell);
 
 
 #endif //DAYLIST_CONTACT_H

@@ -7,9 +7,11 @@
 #include "dateTime.h"
 #include "contact.h"
 
+int GetNextId();
 
 typedef struct s_appointment_cell
 {
+    int id;
     char *description;
     t_date *date;
     t_time *startTime;
