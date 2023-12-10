@@ -19,29 +19,32 @@ void createContactCalendar(t_contact *contact, t_contact_calendar_list *list){
     insertContactCalendar(contactCalendar, list);
 }
 
-void addAppointment(t_contact *contact, t_appointment_cell *appointment, t_contact_calendar_list *list){
-    if (contact == NULL || appointment == NULL || list == NULL){
+void addAppointment(t_contact *contact, t_appointment_cell *appointment, t_contact_calendar_list *list) {
+    if (contact == NULL || appointment == NULL || list == NULL) {
         return;
     }
     t_contact_calendar_cell *current = list->heads[0];
-    if (searchContactCalendar(contact->firstname, list) != NULL){
-        while (current != NULL){
-            if (strcmp(current->event->contact->firstname, contact->firstname) == 0){
+    if (searchContactCalendar(contact->lastname, list) != NULL) {
+        while (current != NULL) {
+            if (strcmp(current->event->contact->firstname, contact->firstname) == 0) {
                 t_appointment_cell *currentAppointment = current->event->appointments->head;
-                while (currentAppointment != NULL){
-                    if (currentAppointment->id == appointment->id){
-                        printf("Appointment with id %d already exists for %s %s\n", appointment->id, contact->firstname, contact->lastname);
-                        return;
-                    }
+                if (currentAppointment == NULL) {
+                    current->event->appointments->head = appointment;
+                    return;
+                }
+                while (currentAppointment->next != NULL) {
                     currentAppointment = currentAppointment->next;
                 }
+                currentAppointment->next = appointment;
                 return;
             }
             current = current->nexts[0];
         }
+
     }
     createContactCalendar(contact, list);
 }
+
 
 void freeContactCalendar(t_contact_calendar *event){
     freeContact(event->contact);
@@ -93,13 +96,12 @@ void displayAppointmentFromContactCalendar(t_contact_calendar_list *list, char *
         return;
     }
     t_contact_calendar_cell *current = list->heads[0];
-    //make the best display ever !
     while (current != NULL){
         if (strcmp(current->event->contact->lastname, name) == 0){
             printf("Appointments for %s %s :\n", current->event->contact->firstname, current->event->contact->lastname);
             t_appointment_cell *currentAppointment = current->event->appointments->head;
             while (currentAppointment != NULL){
-                printf("    Appointment %d : %s on %d/%d/%d at %d:%d for %d:%d\n", currentAppointment->id, currentAppointment->description, currentAppointment->date->day,currentAppointment->date->month,currentAppointment->date->year, currentAppointment->startTime->hour,currentAppointment->startTime->minute, currentAppointment->duration->hour, currentAppointment->duration->minute);
+                printf("Appointment %d : %s on %02d/%02d/%02d at %02d:%02d for %02d:%02d\n", currentAppointment->id, currentAppointment->description, currentAppointment->date->day,currentAppointment->date->month,currentAppointment->date->year, currentAppointment->startTime->hour,currentAppointment->startTime->minute, currentAppointment->duration->hour, currentAppointment->duration->minute);
                 currentAppointment = currentAppointment->next;
             }
             return;
@@ -261,48 +263,32 @@ void insertContactCalendar(t_contact_calendar *contactCalendar, t_contact_calend
     current->nexts[searchLevel]->nexts[searchLevel] = newCell;
 }
 
-void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, int id)
-{
-    if (list == NULL || list->heads == NULL)
-    {
+void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, int id){
+    if (list == NULL || list->heads == NULL){
         return;
     }
-
-    int maxLevel = list->heads[0]->levels;
-
-    for (int level = maxLevel - 1; level >= 0; level--)
-    {
-        t_contact_calendar_cell *current = list->heads[level];
-        t_contact_calendar_cell *prev = NULL;
-
-        while (current != NULL)
-        {
-            if (current->event->appointments->head->id == id)
-            {
-                if (prev == NULL)
-                {
-                    list->heads[level] = current->nexts[0];
-                }
-                else
-                {
-                    prev->nexts[level] = current->nexts[level];
-                }
-                free(current->event->appointments->head->description);
-                free(current->event->appointments->head->date);
-                free(current->event->appointments->head->startTime);
-                free(current->event->appointments->head->duration);
-                free(current->event->appointments->head);
-                free(current->event->appointments);
-                free(current->event->contact->firstname);
-                free(current->event->contact->lastname);
-                free(current->event->contact);
-                free(current->event);
-                free(current);
-                break;
-            }
-            prev = current;
-            current = current->nexts[level];
+    t_contact_calendar_cell *current = list->heads[0];
+    while (current != NULL){
+        t_appointment_cell *currentAppointment = current->event->appointments->head;
+        if (currentAppointment == NULL){
+            current = current->nexts[0];
+            continue;
         }
+        if (currentAppointment->id == id){
+            current->event->appointments->head = currentAppointment->next;
+            free(currentAppointment);
+            return;
+        }
+        while (currentAppointment->next != NULL){
+            if (currentAppointment->next->id == id){
+                t_appointment_cell *toRemove = currentAppointment->next;
+                currentAppointment->next = currentAppointment->next->next;
+                free(toRemove);
+                return;
+            }
+            currentAppointment = currentAppointment->next;
+        }
+        current = current->nexts[0];
     }
 }
 
@@ -329,7 +315,7 @@ void saveAppointment(t_contact_calendar_list *list){
 
     for (t_contact_calendar_cell *currentContact = list->heads[0]; currentContact != NULL; currentContact = currentContact->nexts[0]) {
         for (t_appointment_cell *currentAppointment = currentContact->event->appointments->head; currentAppointment != NULL; currentAppointment = currentAppointment->next) {
-            fprintf(file, "%s %s %d %s %d %d %d %d %d\n", currentContact->event->contact->firstname, currentContact->event->contact->lastname, currentAppointment->id, currentAppointment->description, currentAppointment->date->day, currentAppointment->date->month, currentAppointment->date->year, currentAppointment->startTime->hour, currentAppointment->startTime->minute, currentAppointment->duration->hour, currentAppointment->duration->minute);
+            fprintf(file, "%s %s %d %s %02d %02d %04d %02d %02d %02d %02d\n", currentContact->event->contact->firstname, currentContact->event->contact->lastname, currentAppointment->id, currentAppointment->description, currentAppointment->date->day, currentAppointment->date->month, currentAppointment->date->year, currentAppointment->startTime->hour, currentAppointment->startTime->minute, currentAppointment->duration->hour, currentAppointment->duration->minute);
         }
         fprintf(file, "\n");
     }
@@ -356,6 +342,9 @@ void loadAppointment(t_contact_calendar_list *list){
     int durationMinute;
 
     while (fscanf(file, "%s %s %d %s %d %d %d %d %d %d %d", firstname, lastname, &id, description, &day, &month, &year, &hour, &minute, &durationHour, &durationMinute) != EOF) {
+        if (strcmp(firstname, "") == 0) {
+            continue;
+        }
         t_contact *contact = createContact(firstname, lastname);
         t_date *date = createDate(day, month, year);
         t_time *startTime = createTime(hour, minute);
@@ -365,4 +354,6 @@ void loadAppointment(t_contact_calendar_list *list){
     }
 
     fclose(file);
+    FILE *file2 = fopen("appointments.txt", "w");
+    fclose(file2);
 }
