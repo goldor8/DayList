@@ -6,6 +6,7 @@
 #include "App.h"
 #include "commands.h"
 #include "contactCalendar.h"
+#include "part1-2/timer.h"
 
 int running = 0;
 t_contact_calendar_list *list = NULL;
@@ -39,8 +40,11 @@ void appLoadCalendar(){
 }
 
 void appAddContact(char *firstname, char *lastname) {
+    startTimer();
     t_contact *contact = createContact(firstname, lastname);
     createContactCalendar(contact, list);
+    stopTimer();
+    printf("Contact added in %s seconds\n", getTimeAsString());
 }
 
 void appSearchContact(char *partialLastname) {
@@ -82,7 +86,6 @@ void appShowContacts() {
     displayPrettyContactCalendarList(*list);
 }
 
-
-
-
-
+void appLoadNameDataset(){
+    loadNamesFromFile(list);
+}

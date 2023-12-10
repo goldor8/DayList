@@ -9,6 +9,8 @@ char* stringcpy(const char* original);
 
 int isBefore(const char* first, const char* second);
 
+int isBeforeOrEqual(const char* first, const char* second);
+
 int isEqual(const char* first, const char* second);
 
 char* getFirstChars(const char* string, int nbChars);

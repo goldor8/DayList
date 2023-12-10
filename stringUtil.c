@@ -31,6 +31,18 @@ int isBefore(const char* first, const char* second) {
     return 0;
 }
 
+int isBeforeOrEqual(const char* first, const char* second) {
+    int i;
+    for(i = 0; first[i] != '\0' && second[i] != '\0'; i++) {
+        if (first[i] < second[i]) {
+            return 1;
+        } else if (first[i] > second[i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int isEqual(const char* first, const char* second) {
     int i;
     for(i = 0; first[i] != '\0' && second[i] != '\0'; i++) {

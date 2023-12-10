@@ -307,19 +307,10 @@ void ExitCommand(char** args, int argCount){
 }
 
 void SaveCommand(char** args, int argCount){
-    if(argCount < 1){
-        printf("Not enough arguments\n");
-        return;
-    }
-
     appSaveCalendar();
 }
 
 void LoadCommand(char** args, int argCount){
-    if(argCount < 1){
-        printf("Not enough arguments\n");
-        return;
-    }
     appLoadCalendar();
 }
 
@@ -382,7 +373,6 @@ void ShowAppointmentCommand(char** args, int argCount){
         printf("Not enough arguments\n");
         return;
     }
-
     appShowAppointments(args[0]);
 }
 
@@ -390,8 +380,9 @@ void InitCommands(){
     AddCommand("help", "Prints all commands", HelpCommand, NULL);
     AddCommand("exit", "Exits the program", ExitCommand, NULL);
 
-    AddCommand("save", "Saves the current calendar", SaveCommand, "<filename>");
-    AddCommand("load", "Loads a calendar", LoadCommand, "<filename>");
+    AddCommand("save", "Saves the current calendar", SaveCommand, NULL);
+    AddCommand("load", "Loads a calendar", LoadCommand, NULL);
+    AddCommand("loaddataset", "Loads a data set of names", appLoadNameDataset, NULL);
 
     AddCommand("contact", "Contact management", NULL, NULL);
     AddSubCommand((char*[]){"contact"}, 1, "add", "Adds a contact", AddContactCommand, "<firstname> <lastname>");

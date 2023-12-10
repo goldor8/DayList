@@ -120,7 +120,7 @@ void displayContactCalendarListLevel(int level, t_contact_calendar_list list){
     printf("Level %d : ", level);
     printf("HEAD->");
     while (current != NULL){
-        printf("%s->", current->event->contact->firstname);
+        printf("%s->", current->event->contact->lastname);
         current = current->nexts[level];
     }
     printf("NULL\n");
@@ -135,7 +135,7 @@ void displayPrettyContactCalendarListLevel(int level, t_contact_calendar_list li
     t_contact_calendar_cell * lowPrevious = list.heads[0];
     printf("Level %d : [HEAD | @]", level);
     while (cell != NULL){
-        while (lowPrevious != cell){
+        while (lowPrevious != cell && lowPrevious != NULL){
             for (int i = 0; i < 9 + strlen(lowPrevious->event->contact->lastname); ++i) {
                 printf("-");
             }
@@ -155,7 +155,7 @@ void displayPrettyContactCalendarListLevel(int level, t_contact_calendar_list li
     printf("-->NULL\n");
 }
 void displayContactCalendarList(t_contact_calendar_list list) {
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < list.levels; ++i) {
         displayContactCalendarListLevel(i, list);
     }
 }
@@ -173,6 +173,7 @@ void insertContactCalendar(t_contact_calendar *contactCalendar, t_contact_calend
 
     int searchLevel = list->levels - 1;
     t_contact_calendar_cell *current = list->heads[searchLevel];
+    t_contact_calendar_cell *previous = NULL;
     if(current == NULL){
         t_contact_calendar_cell *newCell = createContactCalendarCell(contactCalendar, list->levels);
 
@@ -205,20 +206,21 @@ void insertContactCalendar(t_contact_calendar *contactCalendar, t_contact_calend
 
     while (searchLevel > 0){
         //move pointer to the cell juste before the one we want to insert depending on the level
-        while (current->nexts[searchLevel] != NULL && isBefore(getFirstChars(current->nexts[searchLevel]->event->contact->lastname, list->levels - searchLevel),
+        while (current != NULL && isBefore(getFirstChars(current->event->contact->lastname, list->levels - searchLevel),
                                                                getFirstChars(contactCalendar->contact->lastname, list->levels - searchLevel))){
+            previous = current;
             current = current->nexts[searchLevel];
         }
 
         // check if the cell selected has the same first chars as the one we want to insert depending on the level
-        if(current->nexts[searchLevel] != NULL && isEqual(getFirstChars(current->nexts[searchLevel]->event->contact->lastname, list->levels - searchLevel),
+        if(current != NULL && isEqual(getFirstChars(current->event->contact->lastname, list->levels - searchLevel),
                    getFirstChars(contactCalendar->contact->lastname, list->levels - searchLevel))){
             // if it's the case, we check if the cell we want to insert should be before or after the one we selected
-            if(isBefore(contactCalendar->contact->lastname, current->nexts[searchLevel]->event->contact->lastname)){
+            if(isBefore(contactCalendar->contact->lastname, current->event->contact->lastname)){
                 t_contact_calendar_cell *newCell = createContactCalendarCell(contactCalendar, searchLevel + 1);
                 for (int i = 0; i <= searchLevel; ++i) {
-                    newCell->nexts[i] = current->nexts[i];
-                    current->nexts[i] = newCell;
+                    newCell->nexts[i] = current;
+                    previous->nexts[i] = newCell;
                 }
                 int i;
                 for(i = searchLevel; i > 0; i--){
@@ -234,7 +236,7 @@ void insertContactCalendar(t_contact_calendar *contactCalendar, t_contact_calend
 
                 return;
             }
-                //if it should be after we move to the level below
+            //if it should be after we move to the level below
             else{
                 searchLevel--;
             }
@@ -244,23 +246,24 @@ void insertContactCalendar(t_contact_calendar *contactCalendar, t_contact_calend
             t_contact_calendar_cell *newCell = createContactCalendarCell(contactCalendar, searchLevel + 1);
 
             for (int i = 0; i < searchLevel + 1; ++i) {
-                newCell->nexts[i] = current->nexts[i];
-                current->nexts[i] = newCell;
+                newCell->nexts[i] = current;
+                previous->nexts[i] = newCell;
             }
             return;
         }
     }
 
-    while (current->nexts[searchLevel] != NULL && isBefore(current->nexts[searchLevel]->event->contact->lastname, contactCalendar->contact->lastname)){
+    while (current != NULL && isBefore(current->event->contact->lastname, contactCalendar->contact->lastname)){
+        previous = current;
         current = current->nexts[searchLevel];
     }
 
     t_contact_calendar_cell *newCell = createContactCalendarCell(contactCalendar, searchLevel + 1);
-    if(current->nexts[searchLevel] == NULL){
-        current->nexts[searchLevel] = newCell;
+    if(current == NULL){
+        previous->nexts[searchLevel] = newCell;
         return;
     }
-    current->nexts[searchLevel]->nexts[searchLevel] = newCell;
+    current->nexts[searchLevel] = newCell;
 }
 
 void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, int id){
@@ -315,7 +318,7 @@ void saveAppointment(t_contact_calendar_list *list){
 
     for (t_contact_calendar_cell *currentContact = list->heads[0]; currentContact != NULL; currentContact = currentContact->nexts[0]) {
         for (t_appointment_cell *currentAppointment = currentContact->event->appointments->head; currentAppointment != NULL; currentAppointment = currentAppointment->next) {
-            fprintf(file, "%s %s %d %s %02d %02d %04d %02d %02d %02d %02d\n", currentContact->event->contact->firstname, currentContact->event->contact->lastname, currentAppointment->id, currentAppointment->description, currentAppointment->date->day, currentAppointment->date->month, currentAppointment->date->year, currentAppointment->startTime->hour, currentAppointment->startTime->minute, currentAppointment->duration->hour, currentAppointment->duration->minute);
+            fprintf(file, "%s %s %s %02d %02d %04d %02d %02d %02d %02d\n", currentContact->event->contact->firstname, currentContact->event->contact->lastname, currentAppointment->description, currentAppointment->date->day, currentAppointment->date->month, currentAppointment->date->year, currentAppointment->startTime->hour, currentAppointment->startTime->minute, currentAppointment->duration->hour, currentAppointment->duration->minute);
         }
         fprintf(file, "\n");
     }
@@ -331,7 +334,6 @@ void loadAppointment(t_contact_calendar_list *list){
 
     char firstname[50];
     char lastname[50];
-    int id;
     char description[50];
     int day;
     int month;
@@ -341,7 +343,7 @@ void loadAppointment(t_contact_calendar_list *list){
     int durationHour;
     int durationMinute;
 
-    while (fscanf(file, "%s %s %d %s %d %d %d %d %d %d %d", firstname, lastname, &id, description, &day, &month, &year, &hour, &minute, &durationHour, &durationMinute) != EOF) {
+    while (fscanf(file, "%s %s %s %d %d %d %d %d %d %d", firstname, lastname, description, &day, &month, &year, &hour, &minute, &durationHour, &durationMinute) != EOF) {
         if (strcmp(firstname, "") == 0) {
             continue;
         }
@@ -356,4 +358,24 @@ void loadAppointment(t_contact_calendar_list *list){
     fclose(file);
     FILE *file2 = fopen("appointments.txt", "w");
     fclose(file2);
+}
+
+void loadNamesFromFile(t_contact_calendar_list *list) {
+    FILE *file = fopen("../ext.txt", "r");
+    if (file == NULL) {
+        perror("Erreur lors de l'ouverture du fichier");
+        exit(EXIT_FAILURE);
+    }
+
+    char lastname[50];
+
+    while (fscanf(file, "%s", lastname) != EOF) {
+        if (strcmp(lastname, "") == 0) {
+            continue;
+        }
+        t_contact *contact = createContact(lastname, lastname);
+        createContactCalendar(contact, list);
+    }
+
+    fclose(file);
 }

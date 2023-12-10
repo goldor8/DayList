@@ -5,6 +5,8 @@
 
 #define RESEARCH_VALUE 100
 
+#include "contactCalendar.h"
+
 int main() {
     startApp();
     return 0;

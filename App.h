@@ -23,5 +23,6 @@ void appAddAppointment(char* description, t_date* date,t_time* startTime, t_time
 void appRemoveAppointment(int id);
 void appShowAppointments(char* lastname);
 
+void appLoadNameDataset();
 
 #endif //DAYLIST_APP_H

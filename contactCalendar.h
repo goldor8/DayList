@@ -54,4 +54,6 @@ void removeAppointmentFromCalendarEvent(t_contact_calendar_list *list, int id);
 
 t_contact_calendar_cell* searchContactCalendar(char *partialName, t_contact_calendar_list *list);
 
+void loadNamesFromFile(t_contact_calendar_list *list);
+
 #endif //DAYLIST_CONTACTCALENDAR_H
